@@ -4,14 +4,22 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode test",
     "build": "vue-tsc && vite build",
+    "dev:prod": "vite --mode prod",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/node": "^20.12.12",
+    "@vicons/antd": "^0.12.0",
+    "@vicons/fluent": "^0.12.0",
+    "@vicons/ionicons5": "^0.12.0",
     "axios": "^1.6.8",
     "naive-ui": "^2.38.2",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.1",
+    "unplugin-vue-components": "^0.27.0",
+    "vite-plugin-html": "^3.2.2",
     "vue": "^3.4.21",
     "vue-router": "4"
   },
