@@ -1,46 +1,22 @@
-import Layout from '@/layouts/base-layout/index.vue'
+import type { ElegantRoute, CustomRoute } from "@elegant-router/types";
+import { generatedRoutes } from "../elegant/routes";
+import { layouts, views } from "../elegant/imports";
+import { transformElegantRoutesToVueRoutes } from "../elegant/transform";
 
-const routes = [
+const customRoutes: CustomRoute[] = [
 	{
-		name: 'root',
-		path: '/',
-        redirect: '/dashboard',
+		name: "root",
+		path: "/",
+		redirect: {
+			name: "dashboard",
+		},
 	},
-    {
-        path: '/dashboard',
-        component: Layout,
-        children: [
-            {
-                path: '',
-                name: 'dashboard',
-                component: () => import('@/views/dashboard/index.vue'),
-                meta: {
-                    title: 'dashboard',
-                },
-            },
-        ],
-    },
-    {
-        path: '/login',
-        component: () => import('@/views/login/index.vue'),
-        meta: {
-            title: 'login',
-        },
-    },
-    {
-        path: '/about',
-        component: Layout,
-        children: [
-            {
-                path: '',
-                name: 'about',
-                component: () => import('@/views/about/index.vue'),
-                meta: {
-                    title: 'about',
-                },
-            },
-        ],
-    },
-]
+];
 
-export default routes
+const elegantRoutes: ElegantRoute[] = [...customRoutes, ...generatedRoutes];
+
+export const routes = transformElegantRoutesToVueRoutes(
+	elegantRoutes,
+	layouts,
+	views
+);

@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@elegant-router/vue": "0.3.6",
     "@types/node": "^20.12.12",
     "@vicons/antd": "^0.12.0",
     "@vicons/fluent": "^0.12.0",

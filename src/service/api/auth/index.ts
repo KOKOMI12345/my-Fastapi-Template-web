@@ -1,7 +1,7 @@
 import request from '@/service/requent'
 
-export function login(username:string, password: string) {
-	return request<Api.Auth.LoginToken>({
+export const login = (username: string, password: string) => {
+	return request({
 		url: '/auth/login',
 		method: 'post',
 		data: {
@@ -11,8 +11,8 @@ export function login(username:string, password: string) {
 	})
 }
 
-export function refreshToken(refreshToken: string) {
-	return request<Api.Auth.LoginToken>({
+export const refreshToken = (refreshToken: string) => {
+	return request({
 		url: '/auth/refreshToken',
 		method: 'post',
 		data: {
@@ -21,9 +21,10 @@ export function refreshToken(refreshToken: string) {
 	})
 }
 
-export function getUserInfo() {
-	return request<Api.Auth.UserInfo>({
+export const fetchUserInfo = () => {
+	return request({
 		url: '/auth/getUserInfo',
 		method: 'get',
 	})
+
 }

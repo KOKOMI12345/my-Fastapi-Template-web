@@ -1,29 +1,33 @@
 import {defineStore} from "pinia";
-import {Ref, ref} from "vue";
-import {login, refreshToken, getUserInfo} from '@/service/api/auth'
-
+import {computed, ref} from "vue";
+import {login, refreshToken, fetchUserInfo} from '@/service/api/auth'
 
 
 const useUserInfoStore = defineStore('userInfo', () => {
-	const userInfo: Ref<Api.Auth.UserInfo> = ref({
-		userId: '',
-		username: '',
-		roles: [] as string[],
-		permissions: [] as string[]
-	})
+	const userId = ref('')
+	const username = ref('')
+	const roles = ref([] as string[])
+	const permissions = ref([] as string[])
 
-	return {userInfo}
+
+	return {
+		userId,
+		username,
+		roles,
+		permissions
+	}
 }, {
 	persist: true,
 })
 
 const useTokenStore = defineStore('token', () => {
-	const token: Ref<Api.Auth.LoginToken> = ref({
-		token: '',
-		refreshToken: ''
-	})
+	const token = ref('')
+	const refreshToken = ref('')
 
-	return {token}
+	return {
+		token,
+		refreshToken
+	}
 }, {
 	persist: true,
 })
@@ -32,35 +36,69 @@ export const useAuthStore = defineStore('auth', () => {
 	const userInfoStore = useUserInfoStore()
 	const tokenStore = useTokenStore()
 
-	const loginByToken = async (loginToken: Api.Auth.LoginToken) => {
-		tokenStore.token = loginToken
-		try {
-			const {data: info} = await getUserInfo()
-			userInfoStore.userInfo = info
-			return true
-		} catch (e) {
-			return false
-		}
-
+	const doLogin = async (username: string, password: string) => {
+		const {data: loginToken} = await login(username, password)
+		return await loginByToken(loginToken);
 
 	}
 
-	const doLogin = async (username: string, password: string) => {
-		const {data: loginToken} = await login(username, password)
-		const pass = await loginByToken(loginToken);
-		if (pass) {
+	const loginByToken = async (loginToken: Api.Auth.LoginToken) => {
+		tokenStore.token = loginToken.token
+		tokenStore.refreshToken = loginToken.refreshToken
+		const {data: info} = await fetchUserInfo()
+		if (info) {
+			userInfoStore.userId = info.userId
+			userInfoStore.username = info.username
+			userInfoStore.roles = info.roles
+			userInfoStore.permissions = info.permissions
 			return true
 		}
 		return false
 	}
 
 	const doRefreshToken = async () => {
-		const res = await refreshToken(tokenStore.token.refreshToken)
-		tokenStore.token = res.data
+		const {data: loginToken} = await refreshToken(tokenStore.refreshToken)
+		if (loginToken) {
+			tokenStore.token = loginToken.token
+			tokenStore.refreshToken = loginToken.refreshToken
+			return true
+		}
+		return false
 	}
+
+	const getUserInfo = computed(async () => {
+		return {
+			userId: userInfoStore.userId,
+			username: userInfoStore.username,
+			roles: userInfoStore.roles,
+			permissions: userInfoStore.permissions
+		}
+	})
+
+	const getToken = computed(() => {
+		return {
+			token: tokenStore.token,
+			refreshToken: tokenStore.refreshToken
+		}
+	})
+
+
+
+	const clearAuthStorage = () => {
+		userInfoStore.$reset()
+		tokenStore.$reset()
+	}
+
+	const isLogin = computed(() => Boolean(tokenStore.token));
+	const hasUserInfo = computed(() => Boolean(userInfoStore.userId));
 
 	return {
 		doLogin,
 		doRefreshToken,
+		getUserInfo,
+		clearAuthStorage,
+		isLogin,
+		hasUserInfo,
+		getToken
 	}
 })

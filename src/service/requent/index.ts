@@ -1,6 +1,7 @@
 import axios from 'axios'
 import {useMessage} from 'naive-ui';
-import {getToken} from '@/utils/auth'
+import {useAuthStore} from "@/store/modules/auth";
+
 
 const service = axios.create({
 	baseURL: '/api',
@@ -9,15 +10,16 @@ const service = axios.create({
 
 // request拦截器
 service.interceptors.request.use(config => {
-	const token = getToken()
+	const authStore = useAuthStore()
+	const token = authStore.getToken.token
 	if (token) {
-		config.headers['Authorization'] = token // 让每个请求携带自定义token 请根据实际情况自行修改
+		config.headers['Authorization'] = `Bearer ${token}` // 让每个请求携带自定义token 请根据实际情况自行修改
 	}
 	return config
 }, error => {
 	// Do something with request error
 	console.log(error) // for debug
-	Promise.reject(error)
+	return Promise.reject(error)
 })
 
 // response 拦截器
@@ -35,7 +37,7 @@ service.interceptors.response.use(
 	error => {
 		console.log('err' + error)
 		const message = useMessage()
-		message.error("error")
+		message.error("err" + error)
 		return Promise.reject(error)
 	})
 
