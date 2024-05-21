@@ -4,6 +4,7 @@ import {resolve} from 'path';
 import Components from 'unplugin-vue-components/vite'
 import {NaiveUiResolver} from 'unplugin-vue-components/resolvers'
 import {createHtmlPlugin} from "vite-plugin-html";
+import ElegantVueRouter from "@elegant-router/vue/vite";
 
 
 export default defineConfig(configEnv => {
@@ -15,6 +16,15 @@ export default defineConfig(configEnv => {
 			vue(),
 			Components({
 				resolvers: [NaiveUiResolver()],
+			}),
+			ElegantVueRouter({
+				alias: {
+					"@": "src",
+				},
+				layouts: {
+					blank: "src/layouts/blank-layout/index.vue",
+					base: "src/layouts/base-layout/index.vue",
+				},
 			}),
 			createHtmlPlugin({
 				inject: {

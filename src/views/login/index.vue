@@ -4,13 +4,13 @@ import {ref} from 'vue';
 import {useRouter} from "vue-router";
 import {useAuthStore} from "@/store/modules/auth";
 import {useMessage} from 'naive-ui';
-import {getUserInfo} from '@/utils/auth'
+
+const router = useRouter();
 
 const message = useMessage()
 
-const authStore = useAuthStore();
 
-const router = useRouter();
+const authStore = useAuthStore();
 
 const loginForm = ref({
   username: '',
@@ -18,14 +18,15 @@ const loginForm = ref({
 });
 
 const handleSubmit = async () => {
-    const boolean = await authStore.doLogin(loginForm.value.username, loginForm.value.password);
-    if (boolean) {
-      const {username} = getUserInfo();
-      message.success(`欢迎回来, ${username}`)
-        await router.push('/');
-    } else {
-      message.error('登录失败!')
-    }
+
+  const boolean = await authStore.doLogin(loginForm.value.username, loginForm.value.password);
+  if (boolean) {
+    const {username} = await authStore.getUserInfo;
+    message.success(`欢迎回来, ${username}`)
+    await router.push('/');
+  } else {
+    message.error('登录失败!')
+  }
 
 };
 </script>
